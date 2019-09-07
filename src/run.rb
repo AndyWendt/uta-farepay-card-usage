@@ -10,8 +10,9 @@ class UtaSpider < Kimurai::Base
 
   def parse(response, url:, data: {})
     credentials = YAML.load_file(File.expand_path('~') + '/.uta/secret.yml')
-    positive = []
-    negative = []
+    @positive = []
+    @negative = []
+
     browser.fill_in "j_username", with: credentials['username']
     browser.fill_in "j_password", with: credentials['password']
     browser.click_button "Login"
@@ -22,15 +23,23 @@ class UtaSpider < Kimurai::Base
     browser.find('//*[@id="cardSeletor"]/option[2]').click
     browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
 
+    process_amounts
+
+    pp @positive.reduce(zero) { |sum, money| sum + money}
+    pp @negative.reduce(zero) { |sum, money| sum + money}
+  end
+
+  def process_amounts
     tr = browser.all('//*[@id="data"]/tbody/tr/td[4]')
-    zero = Monetize.parse('$0.00')
     tr.each do |td|
       value = Monetize.parse(td.text)
-      positive.push(value) if (value > zero)
-      negative.push(value) if (value < zero)
+      @positive.push(value) if (value > zero)
+      @negative.push(value) if (value < zero)
     end
-    pp positive.reduce(zero) { |sum, money| sum + money}
-    pp negative.reduce(zero) { |sum, money| sum + money}
+  end
+
+  def zero
+    Monetize.parse('$0.00')
   end
 end
 
