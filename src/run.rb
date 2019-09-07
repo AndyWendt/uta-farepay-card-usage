@@ -23,6 +23,7 @@ class UtaSpider < Kimurai::Base
     browser.find('//*[@id="list-nav"]/li[4]/a').click
     browser.find('//*[@id="cardSeletor"]/option[2]').click
     browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
+    sleep(1)
     number = browser.find('//*[@id="displayTagDiv"]/span').text
     pp number[/\d+/]
     process_amounts
