@@ -28,18 +28,21 @@ class UtaSpider < Kimurai::Base
 
     number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
     process_amounts
-    pages = (number / 5).ceil
+    pages = (number.to_f / 5.to_f).ceil
     page = 2
 
-    while page < pages
-      browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span/a[' + page.to_s + ']').click
-      sleep(2)
+    while page <= pages
+      links = browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span')
+      links.all('a').find { |a| a.text == page.to_s }.click
+      sleep(1)
       process_amounts
       page += 1
     end
 
-    pp @positive.reduce(zero) { |sum, money| sum + money}
-    pp @negative.reduce(zero) { |sum, money| sum + money}
+    positive_result = @positive.reduce(zero) { |sum, money| sum + money}
+    negative_result =  @negative.reduce(zero) { |sum, money| sum + money}
+    pp 'Contributions: ' + positive_result.format
+    pp 'Ticket Cost: ' + negative_result.format
   end
 
   def process_amounts
