@@ -1,8 +1,6 @@
-
 source "https://rubygems.org"
 
-gem "nokogiri"
-gem "mechanize"
+gem 'kimurai'
 gem "pry"
 gem "highline"
 
