@@ -6,11 +6,7 @@ require 'pry'
 
 url = 'https://farepay.rideuta.com'
 
-store = OpenSSL::X509::Store.new
-store.add_file File.dirname(__FILE__) + '/digicert-root-ca.crt'
-
 agent = Mechanize.new
-agent.cert_store = store
 agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
 page = agent.get(url)
 
