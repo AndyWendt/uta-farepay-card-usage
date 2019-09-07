@@ -21,15 +21,22 @@ class UtaSpider < Kimurai::Base
     # Update response to current response after interaction with a browser
     response = browser.current_response
     browser.find('//*[@id="list-nav"]/li[4]/a').click
+    sleep(1)
     browser.find('//*[@id="cardSeletor"]/option[2]').click
     browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
     sleep(1)
-    number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
 
-    while @total < number
-      browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span/a[7]').click
+    number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
+    process_amounts
+    pages = (number / 5).ceil
+    page = 1
+
+    while page < pages
+
+      browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span/a[' + page.to_s + ']').click
       sleep(2)
       process_amounts
+      page += 1
     end
 
     pp @positive.reduce(zero) { |sum, money| sum + money}
