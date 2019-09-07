@@ -16,10 +16,11 @@ class UtaSpider < Kimurai::Base
     response = browser.current_response
     browser.find('//*[@id="list-nav"]/li[4]/a').click
     response = browser.current_response
-    browser.select "108369", from: "cardSeletor"
-    # browser.select "2", from: "dateRangeSeletor"
-    # response = browser.current_response
-    pp response
+    browser.find('//*[@id="cardSeletor"]/option[2]').click
+    browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
+    response = browser.current_response
+    tr = browser.all('//*[@id="data"]/tbody/tr/td[4]')
+    tr.each { |td| pp td.text }
   end
 end
 
