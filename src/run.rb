@@ -32,16 +32,6 @@ class UtaSpider < Kimurai::Base
     pp positive.reduce(zero) { |sum, money| sum + money}
     pp negative.reduce(zero) { |sum, money| sum + money}
   end
-
-  def wait_for_ajax
-    Timeout.timeout(Capybara.default_max_wait_time) do
-      loop until finished_all_ajax_requests?
-    end
-  end
-
-  def finished_all_ajax_requests?
-    browser.evaluate_script('jQuery.active').zero?
-  end
 end
 
 UtaSpider.crawl!
