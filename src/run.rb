@@ -29,7 +29,8 @@ class UtaSpider < Kimurai::Base
       positive.push(value) if (value > zero)
       negative.push(value) if (value < zero)
     end
-    pp positive, negative
+    pp positive.reduce(zero) { |sum, money| sum + money}
+    pp negative.reduce(zero) { |sum, money| sum + money}
   end
 
   def wait_for_ajax
