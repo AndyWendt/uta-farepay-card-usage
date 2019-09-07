@@ -29,10 +29,9 @@ class UtaSpider < Kimurai::Base
     number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
     process_amounts
     pages = (number / 5).ceil
-    page = 1
+    page = 2
 
     while page < pages
-
       browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span/a[' + page.to_s + ']').click
       sleep(2)
       process_amounts
