@@ -24,9 +24,13 @@ class UtaSpider < Kimurai::Base
     browser.find('//*[@id="cardSeletor"]/option[2]').click
     browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
     sleep(1)
-    number = browser.find('//*[@id="displayTagDiv"]/span').text
-    pp number[/\d+/]
-    process_amounts
+    number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
+
+    while @total < number
+      browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span/a[7]').click
+      sleep(2)
+      process_amounts
+    end
 
     pp @positive.reduce(zero) { |sum, money| sum + money}
     pp @negative.reduce(zero) { |sum, money| sum + money}
