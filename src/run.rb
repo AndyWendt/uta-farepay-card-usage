@@ -14,8 +14,12 @@ class UtaSpider < Kimurai::Base
 
     # Update response to current response after interaction with a browser
     response = browser.current_response
+    browser.find('//*[@id="list-nav"]/li[4]/a').click
+    response = browser.current_response
+    browser.select "108369", from: "cardSeletor"
+    # browser.select "2", from: "dateRangeSeletor"
+    # response = browser.current_response
     pp response
-    browser.click_link "View Card Activity/Check Balance"
   end
 end
 
