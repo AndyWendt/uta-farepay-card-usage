@@ -6,6 +6,7 @@ GEM
     diff-lcs (1.3)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    highline (2.0.2)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     mechanize (2.7.6)
@@ -54,6 +55,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  highline
   mechanize
   nokogiri
   pry
