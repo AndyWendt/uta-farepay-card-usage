@@ -81,7 +81,14 @@ class UtaSpider < Kimurai::Base
   private
 
   def select_time_period
-    browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
+    date_range_options = browser.all('//*[@id="dateRangeSeletor"]/option')
+    choices = get_option_choices(date_range_options)
+    @cli.choose do |menu|
+      menu.prompt = "Select Date Range"
+      choices.each_with_index { |choice, index| menu.choice(choice) { @selected_time_period = index } }
+    end
+
+    browser.find('//*[@id="dateRangeSeletor"]/option[' + (@selected_time_period + 1).to_s + ']').click
   end
 
   def select_card
