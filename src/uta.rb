@@ -16,16 +16,13 @@ class UtaSpider < Kimurai::Base
     goto_card_activity_and_balance
     select_card
     select_date_range
-
-    process_first_page_amounts
-    process_remaining_pages
-
+    process_card_activity_pages
     display_end_totals
   end
 
   private
 
-  def process_first_page_amounts
+  def process_first_page_activity_amounts
     process_amounts
   end
 
@@ -51,7 +48,9 @@ class UtaSpider < Kimurai::Base
     wait_for_ajax
   end
 
-  def process_remaining_pages
+  def process_card_activity_pages
+    process_first_page_activity_amounts
+
     transactions_total = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
     pages = (transactions_total.to_f / 5.to_f).ceil
     page = 2
