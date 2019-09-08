@@ -15,7 +15,7 @@ class UtaSpider < Kimurai::Base
     login
     goto_card_activity_and_balance
     select_card
-    select_time_period
+    select_date_range
 
     process_first_page_amounts
     process_remaining_pages
@@ -74,7 +74,7 @@ class UtaSpider < Kimurai::Base
     @cli.say("<%= color('Difference: #{(contribution_total + usage_total).format}', BOLD) %>")
   end
 
-  def select_time_period
+  def select_date_range
     date_range_options = browser.all('//*[@id="dateRangeSeletor"]/option')
     choices = get_option_choices(date_range_options)
     @cli.choose do |menu|
