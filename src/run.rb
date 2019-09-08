@@ -2,6 +2,7 @@ require 'kimurai'
 require 'yaml'
 require 'pry'
 require 'monetize'
+require 'highline'
 
 class UtaSpider < Kimurai::Base
   @name = "UTA Spider"
@@ -10,6 +11,7 @@ class UtaSpider < Kimurai::Base
 
   def parse(response, url:, data: {})
     credentials = YAML.load_file(File.expand_path('~') + '/.uta/secret.yml')
+    cli = HighLine.new
     @positive = []
     @negative = []
     @total = 0
@@ -41,8 +43,10 @@ class UtaSpider < Kimurai::Base
 
     positive_result = @positive.reduce(zero) { |sum, money| sum + money}
     negative_result =  @negative.reduce(zero) { |sum, money| sum + money}
-    pp 'Contributions: ' + positive_result.format
-    pp 'Ticket Cost: ' + negative_result.format
+
+    cli.say("<%= color('Contributions: #{positive_result.format}', BOLD) %>!")
+    cli.say("<%= color('Usage: #{negative_result.format}', BOLD) %>!")
+    cli.say("<%= color('Difference: #{(positive_result - negative_result).format}', BOLD) %>!")
   end
 
   def process_amounts
