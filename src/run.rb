@@ -47,7 +47,7 @@ class UtaSpider < Kimurai::Base
 
     cli.say("<%= color('Contributions: #{positive_result.format}', BOLD) %>!")
     cli.say("<%= color('Usage: #{negative_result.format}', BOLD) %>!")
-    cli.say("<%= color('Difference: #{(positive_result - negative_result).format}', BOLD) %>!")
+    cli.say("<%= color('Difference: #{(positive_result + negative_result).format}', BOLD) %>!")
   end
 
   def process_amounts
