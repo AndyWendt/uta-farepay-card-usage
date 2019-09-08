@@ -19,4 +19,4 @@ password: uta-password
 
 ## Running
 
-To run while also seeing the browser execute: `HEADLESS=false ruby src/run.rb`
+To run while also seeing the browser execute: `HEADLESS=false ruby src/uta.rb`
