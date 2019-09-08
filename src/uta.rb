@@ -13,14 +13,9 @@ class UtaSpider < Kimurai::Base
     initialize_defaults
 
     login
-
-    wait_for_ajax
     goto_card_activity_and_balance
-    wait_for_ajax
     select_card
-    wait_for_ajax
     select_time_period
-    wait_for_ajax
 
     process_first_page_amounts
     process_remaining_pages
@@ -53,6 +48,7 @@ class UtaSpider < Kimurai::Base
 
     # Update response to current response after interaction with a browser
     response = browser.current_response
+    wait_for_ajax
   end
 
   def process_remaining_pages
@@ -87,6 +83,7 @@ class UtaSpider < Kimurai::Base
     end
 
     browser.find('//*[@id="dateRangeSeletor"]/option[' + (@selected_time_period + 1).to_s + ']').click
+    wait_for_ajax
   end
 
   def select_card
@@ -100,6 +97,7 @@ class UtaSpider < Kimurai::Base
     end
 
     browser.find('//*[@id="cardSeletor"]/option[' + (@selected_card + 2).to_s + ']').click
+    wait_for_ajax
   end
 
   def get_option_choices(option_elements)
@@ -115,6 +113,7 @@ class UtaSpider < Kimurai::Base
 
   def goto_card_activity_and_balance
     browser.find('//*[@id="list-nav"]/li[4]/a').click
+    wait_for_ajax
   end
 
   def wait_for_ajax
