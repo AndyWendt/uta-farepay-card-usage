@@ -12,8 +12,8 @@ class UtaSpider < Kimurai::Base
   def parse(response, url:, data: {})
     credentials = YAML.load_file(File.expand_path('~') + '/.uta/secret.yml')
     cli = HighLine.new
-    @positive = []
-    @negative = []
+    @contributions = []
+    @usage = []
     @total = 0
     Money.locale_backend = :currency
 
@@ -44,12 +44,12 @@ class UtaSpider < Kimurai::Base
       page += 1
     end
 
-    positive_result = @positive.reduce(zero) { |sum, money| sum + money}
-    negative_result =  @negative.reduce(zero) { |sum, money| sum + money}
+    contribution_total = @contributions.reduce(zero) { |sum, money| sum + money}
+    usage_total =  @usage.reduce(zero) { |sum, money| sum + money}
 
-    cli.say("<%= color('Contributions: #{positive_result.format}', BOLD) %>")
-    cli.say("<%= color('Usage: #{negative_result.format}', BOLD) %>")
-    cli.say("<%= color('Difference: #{(positive_result + negative_result).format}', BOLD) %>")
+    cli.say("<%= color('Contributions: #{contribution_total.format}', BOLD) %>")
+    cli.say("<%= color('Usage: #{usage_total.format}', BOLD) %>")
+    cli.say("<%= color('Difference: #{(contribution_total + usage_total).format}', BOLD) %>")
   end
 
   def wait_for_ajax
@@ -66,8 +66,8 @@ class UtaSpider < Kimurai::Base
     tr.each do |td|
       value = Monetize.parse(td.text)
       @total += 1
-      @positive.push(value) if (value > zero)
-      @negative.push(value) if (value < zero)
+      @contributions.push(value) if (value > zero)
+      @usage.push(value) if (value < zero)
     end
   end
 
