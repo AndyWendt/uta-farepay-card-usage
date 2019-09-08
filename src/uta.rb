@@ -87,14 +87,7 @@ class UtaSpider < Kimurai::Base
   def select_card
     card_options = browser.all('//*[@id="cardSeletor"]/option')
 
-    choices = card_options.reduce([]) do |options, option|
-      if option.value.empty?
-        options
-      else
-        options.push(option.text)
-        options
-      end
-    end
+    choices = get_option_choices(card_options)
 
     @cli.choose do |menu|
       menu.prompt = "Select Card"
@@ -102,6 +95,17 @@ class UtaSpider < Kimurai::Base
     end
 
     browser.find('//*[@id="cardSeletor"]/option[' + (@selected_card + 2).to_s + ']').click
+  end
+
+  def get_option_choices(option_elements)
+    option_elements.reduce([]) do |options, option|
+      if option.value.empty?
+        options
+      else
+        options.push(option.text)
+        options
+      end
+    end
   end
 
   def goto_card_activity_and_balance
