@@ -15,6 +15,7 @@ class UtaSpider < Kimurai::Base
     @positive = []
     @negative = []
     @total = 0
+    Money.locale_backend = :currency
 
     browser.fill_in "j_username", with: credentials['username']
     browser.fill_in "j_password", with: credentials['password']
