@@ -56,13 +56,13 @@ class UtaSpider < Kimurai::Base
   end
 
   def process_remaining_pages
-    number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
-    pages = (number.to_f / 5.to_f).ceil
+    transactions_total = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
+    pages = (transactions_total.to_f / 5.to_f).ceil
     page = 2
 
     while page <= pages
-      links = browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span')
-      links.all('a').find { |a| a.text == page.to_s }.click
+      page_links = browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span')
+      page_links.all('a').find { |a| a.text == page.to_s }.click
       wait_for_ajax
       process_amounts
       page += 1
