@@ -55,29 +55,6 @@ class UtaSpider < Kimurai::Base
     @cli.say("<%= color('Difference: #{(contribution_total + usage_total).format}', BOLD) %>")
   end
 
-  def wait_for_ajax
-    Timeout.timeout(Capybara.default_max_wait_time) do
-      active = browser.evaluate_script('jQuery.active')
-      until active == 0
-        active = browser.evaluate_script('jQuery.active')
-      end
-    end
-  end
-
-  def process_amounts
-    tr = browser.all('//*[@id="data"]/tbody/tr/td[4]')
-    tr.each do |td|
-      value = Monetize.parse(td.text)
-      @total += 1
-      @contributions.push(value) if (value > zero)
-      @usage.push(value) if (value < zero)
-    end
-  end
-
-  def zero
-    Monetize.parse('$0.00')
-  end
-
   private
 
   def select_time_period
@@ -117,6 +94,29 @@ class UtaSpider < Kimurai::Base
 
   def goto_card_activity_and_balance
     browser.find('//*[@id="list-nav"]/li[4]/a').click
+  end
+
+  def wait_for_ajax
+    Timeout.timeout(Capybara.default_max_wait_time) do
+      active = browser.evaluate_script('jQuery.active')
+      until active == 0
+        active = browser.evaluate_script('jQuery.active')
+      end
+    end
+  end
+
+  def process_amounts
+    tr = browser.all('//*[@id="data"]/tbody/tr/td[4]')
+    tr.each do |td|
+      value = Monetize.parse(td.text)
+      @total += 1
+      @contributions.push(value) if (value > zero)
+      @usage.push(value) if (value < zero)
+    end
+  end
+
+  def zero
+    Monetize.parse('$0.00')
   end
 end
 
