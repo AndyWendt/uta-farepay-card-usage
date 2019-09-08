@@ -1,5 +1,7 @@
 # UTA Farepay Card Usage
 
+![output](./docs/uta-usage.png)
+
 ## Installation
 
 Need to make sure that the necessary requisites are installed: 
