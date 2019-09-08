@@ -10,22 +10,10 @@ class UtaSpider < Kimurai::Base
   @start_urls = ['https://farepay.rideuta.com']
 
   def parse(response, url:, data: {})
-    credentials = YAML.load_file(File.expand_path('~') + '/.uta/secret.yml')
-    @cli = HighLine.new
-    @contributions = []
-    @usage = []
-    @total = 0
-    @selected_card = nil
-    @selected_time_period = nil
+    initialize_defaults
 
-    Money.locale_backend = :currency
+    login
 
-    browser.fill_in "j_username", with: credentials['username']
-    browser.fill_in "j_password", with: credentials['password']
-    browser.click_button "Login"
-
-    # Update response to current response after interaction with a browser
-    response = browser.current_response
     wait_for_ajax
     goto_card_activity_and_balance
     wait_for_ajax
@@ -34,8 +22,41 @@ class UtaSpider < Kimurai::Base
     select_time_period
     wait_for_ajax
 
-    number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
+    process_first_page_amounts
+    process_remaining_pages
+
+    display_end_totals
+  end
+
+  private
+
+  def process_first_page_amounts
     process_amounts
+  end
+
+  def initialize_defaults
+    @cli = HighLine.new
+    @contributions = []
+    @usage = []
+    @total = 0
+    @selected_card = nil
+    @selected_time_period = nil
+
+    Money.locale_backend = :currency
+  end
+
+  def login
+    credentials = YAML.load_file(File.expand_path('~') + '/.uta/secret.yml')
+    browser.fill_in "j_username", with: credentials['username']
+    browser.fill_in "j_password", with: credentials['password']
+    browser.click_button "Login"
+
+    # Update response to current response after interaction with a browser
+    response = browser.current_response
+  end
+
+  def process_remaining_pages
+    number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
     pages = (number.to_f / 5.to_f).ceil
     page = 2
 
@@ -46,16 +67,16 @@ class UtaSpider < Kimurai::Base
       process_amounts
       page += 1
     end
+  end
 
-    contribution_total = @contributions.reduce(zero) { |sum, money| sum + money}
-    usage_total =  @usage.reduce(zero) { |sum, money| sum + money}
+  def display_end_totals
+    contribution_total = @contributions.reduce(zero) { |sum, money| sum + money }
+    usage_total = @usage.reduce(zero) { |sum, money| sum + money }
 
     @cli.say("<%= color('Contributions: #{contribution_total.format}', BOLD) %>")
     @cli.say("<%= color('Usage: #{usage_total.format}', BOLD) %>")
     @cli.say("<%= color('Difference: #{(contribution_total + usage_total).format}', BOLD) %>")
   end
-
-  private
 
   def select_time_period
     date_range_options = browser.all('//*[@id="dateRangeSeletor"]/option')
