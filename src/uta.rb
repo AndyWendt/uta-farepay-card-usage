@@ -11,10 +11,13 @@ class UtaSpider < Kimurai::Base
 
   def parse(response, url:, data: {})
     credentials = YAML.load_file(File.expand_path('~') + '/.uta/secret.yml')
-    cli = HighLine.new
+    @cli = HighLine.new
     @contributions = []
     @usage = []
     @total = 0
+    @selected_card = nil
+    @selected_time_period = nil
+
     Money.locale_backend = :currency
 
     browser.fill_in "j_username", with: credentials['username']
@@ -47,9 +50,9 @@ class UtaSpider < Kimurai::Base
     contribution_total = @contributions.reduce(zero) { |sum, money| sum + money}
     usage_total =  @usage.reduce(zero) { |sum, money| sum + money}
 
-    cli.say("<%= color('Contributions: #{contribution_total.format}', BOLD) %>")
-    cli.say("<%= color('Usage: #{usage_total.format}', BOLD) %>")
-    cli.say("<%= color('Difference: #{(contribution_total + usage_total).format}', BOLD) %>")
+    @cli.say("<%= color('Contributions: #{contribution_total.format}', BOLD) %>")
+    @cli.say("<%= color('Usage: #{usage_total.format}', BOLD) %>")
+    @cli.say("<%= color('Difference: #{(contribution_total + usage_total).format}', BOLD) %>")
   end
 
   def wait_for_ajax
@@ -82,7 +85,23 @@ class UtaSpider < Kimurai::Base
   end
 
   def select_card
-    browser.find('//*[@id="cardSeletor"]/option[2]').click
+    card_options = browser.all('//*[@id="cardSeletor"]/option')
+
+    choices = card_options.reduce([]) do |options, option|
+      if option.value.empty?
+        options
+      else
+        options.push(option.text)
+        options
+      end
+    end
+
+    @cli.choose do |menu|
+      menu.prompt = "Select Card"
+      choices.each_with_index { |choice, index| menu.choice(choice) { @selected_card = index } }
+    end
+
+    browser.find('//*[@id="cardSeletor"]/option[' + (@selected_card + 2).to_s + ']').click
   end
 
   def goto_card_activity_and_balance
