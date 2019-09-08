@@ -13,8 +13,8 @@ Need to make sure that the necessary requisites are installed:
 Create a file, `~/.uta/secrets.yml`, that has the following contents: 
 
 ```yaml
-username: myusername
-password: secret
+username: uta-username
+password: uta-password
 ```
 
 ## Running
