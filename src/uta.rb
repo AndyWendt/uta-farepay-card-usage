@@ -24,11 +24,11 @@ class UtaSpider < Kimurai::Base
     # Update response to current response after interaction with a browser
     response = browser.current_response
     wait_for_ajax
-    browser.find('//*[@id="list-nav"]/li[4]/a').click
+    goto_card_activity_and_balance
     wait_for_ajax
-    browser.find('//*[@id="cardSeletor"]/option[2]').click
+    select_card
     wait_for_ajax
-    browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
+    select_time_period
     wait_for_ajax
 
     number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
@@ -73,6 +73,20 @@ class UtaSpider < Kimurai::Base
 
   def zero
     Monetize.parse('$0.00')
+  end
+
+  private
+
+  def select_time_period
+    browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
+  end
+
+  def select_card
+    browser.find('//*[@id="cardSeletor"]/option[2]').click
+  end
+
+  def goto_card_activity_and_balance
+    browser.find('//*[@id="list-nav"]/li[4]/a').click
   end
 end
 
