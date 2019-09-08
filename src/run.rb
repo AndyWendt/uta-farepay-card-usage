@@ -23,11 +23,13 @@ class UtaSpider < Kimurai::Base
 
     # Update response to current response after interaction with a browser
     response = browser.current_response
+    wait_for_ajax
     browser.find('//*[@id="list-nav"]/li[4]/a').click
-    sleep(1)
+    wait_for_ajax
     browser.find('//*[@id="cardSeletor"]/option[2]').click
+    wait_for_ajax
     browser.find('//*[@id="dateRangeSeletor"]/option[2]').click
-    sleep(1)
+    wait_for_ajax
 
     number = browser.find('//*[@id="displayTagDiv"]/span').text[/\d+/].to_i
     process_amounts
@@ -37,7 +39,7 @@ class UtaSpider < Kimurai::Base
     while page <= pages
       links = browser.find('//*[@id="displayTagDiv"]/table[2]/tbody/tr/td/span')
       links.all('a').find { |a| a.text == page.to_s }.click
-      sleep(1)
+      wait_for_ajax
       process_amounts
       page += 1
     end
@@ -45,9 +47,18 @@ class UtaSpider < Kimurai::Base
     positive_result = @positive.reduce(zero) { |sum, money| sum + money}
     negative_result =  @negative.reduce(zero) { |sum, money| sum + money}
 
-    cli.say("<%= color('Contributions: #{positive_result.format}', BOLD) %>!")
-    cli.say("<%= color('Usage: #{negative_result.format}', BOLD) %>!")
-    cli.say("<%= color('Difference: #{(positive_result + negative_result).format}', BOLD) %>!")
+    cli.say("<%= color('Contributions: #{positive_result.format}', BOLD) %>")
+    cli.say("<%= color('Usage: #{negative_result.format}', BOLD) %>")
+    cli.say("<%= color('Difference: #{(positive_result + negative_result).format}', BOLD) %>")
+  end
+
+  def wait_for_ajax
+    Timeout.timeout(Capybara.default_max_wait_time) do
+      active = browser.evaluate_script('jQuery.active')
+      until active == 0
+        active = browser.evaluate_script('jQuery.active')
+      end
+    end
   end
 
   def process_amounts
