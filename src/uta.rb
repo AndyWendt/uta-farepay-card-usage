@@ -22,10 +22,6 @@ class UtaSpider < Kimurai::Base
 
   private
 
-  def process_first_page_activity_amounts
-    process_amounts
-  end
-
   def initialize_defaults
     @cli = HighLine.new
     @contributions = []
@@ -45,6 +41,37 @@ class UtaSpider < Kimurai::Base
 
     # Update response to current response after interaction with a browser
     response = browser.current_response
+    wait_for_ajax
+  end
+
+  def goto_card_activity_and_balance
+    browser.find('//*[@id="list-nav"]/li[4]/a').click
+    wait_for_ajax
+  end
+
+  def select_card
+    card_options = browser.all('//*[@id="cardSeletor"]/option')
+
+    choices = get_option_choices(card_options)
+
+    @cli.choose do |menu|
+      menu.prompt = "Select Card"
+      choices.each_with_index { |choice, index| menu.choice(choice) { @selected_card = index } }
+    end
+
+    browser.find('//*[@id="cardSeletor"]/option[' + (@selected_card + 2).to_s + ']').click
+    wait_for_ajax
+  end
+
+  def select_date_range
+    date_range_options = browser.all('//*[@id="dateRangeSeletor"]/option')
+    choices = get_option_choices(date_range_options)
+    @cli.choose do |menu|
+      menu.prompt = "Select Date Range"
+      choices.each_with_index { |choice, index| menu.choice(choice) { @selected_time_period = index } }
+    end
+
+    browser.find('//*[@id="dateRangeSeletor"]/option[' + (@selected_time_period + 1).to_s + ']').click
     wait_for_ajax
   end
 
@@ -73,30 +100,8 @@ class UtaSpider < Kimurai::Base
     @cli.say("<%= color('Difference: #{(contribution_total + usage_total).format}', BOLD) %>")
   end
 
-  def select_date_range
-    date_range_options = browser.all('//*[@id="dateRangeSeletor"]/option')
-    choices = get_option_choices(date_range_options)
-    @cli.choose do |menu|
-      menu.prompt = "Select Date Range"
-      choices.each_with_index { |choice, index| menu.choice(choice) { @selected_time_period = index } }
-    end
-
-    browser.find('//*[@id="dateRangeSeletor"]/option[' + (@selected_time_period + 1).to_s + ']').click
-    wait_for_ajax
-  end
-
-  def select_card
-    card_options = browser.all('//*[@id="cardSeletor"]/option')
-
-    choices = get_option_choices(card_options)
-
-    @cli.choose do |menu|
-      menu.prompt = "Select Card"
-      choices.each_with_index { |choice, index| menu.choice(choice) { @selected_card = index } }
-    end
-
-    browser.find('//*[@id="cardSeletor"]/option[' + (@selected_card + 2).to_s + ']').click
-    wait_for_ajax
+  def process_first_page_activity_amounts
+    process_amounts
   end
 
   def get_option_choices(option_elements)
@@ -108,11 +113,6 @@ class UtaSpider < Kimurai::Base
         options
       end
     end
-  end
-
-  def goto_card_activity_and_balance
-    browser.find('//*[@id="list-nav"]/li[4]/a').click
-    wait_for_ajax
   end
 
   def wait_for_ajax
