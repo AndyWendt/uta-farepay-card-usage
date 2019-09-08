@@ -9,20 +9,8 @@ class UtaSpider < Kimurai::Base
   @engine = :selenium_chrome
   @start_urls = ['https://farepay.rideuta.com']
 
-  def parse(response, url:, data: {})
-    initialize_defaults
-
-    login
-    goto_card_activity_and_balance
-    select_card
-    select_date_range
-    process_card_activity_pages
-    display_end_totals
-  end
-
-  private
-
-  def initialize_defaults
+  def initialize()
+    super
     @cli = HighLine.new
     @contributions = []
     @usage = []
@@ -32,6 +20,17 @@ class UtaSpider < Kimurai::Base
 
     Money.locale_backend = :currency
   end
+
+  def parse(response, url:, data: {})
+    login
+    goto_card_activity_and_balance
+    select_card
+    select_date_range
+    process_card_activity_pages
+    display_end_totals
+  end
+
+  private
 
   def login
     credentials = YAML.load_file(File.expand_path('~') + '/.uta/secret.yml')
